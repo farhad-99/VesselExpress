@@ -92,6 +92,11 @@ def run_vesselexpress(workspace_dir, cores="all", dry_run=False, verbose=False):
         If True, perform a dry run without executing
     verbose : bool
         If True, show verbose output
+        
+    Returns:
+    --------
+    int
+        Exit code (0 for success, non-zero for failure)
     """
     # Get the VesselExpress directory
     script_dir = Path(__file__).resolve().parent

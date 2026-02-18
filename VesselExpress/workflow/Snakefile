@@ -12,32 +12,34 @@ configfile: get_config_file('data')
 
 
 def get_files_and_extensions(path):
-    files = [os.path.splitext(f) for f in os.listdir(path) if (f.endswith('tif') or f.endswith('.tiff')
-             or f.endswith('.jpg') or f.endswith('.png') or f.endswith('.nii') or f.endswith('.nii.gz')) 
-             and not f.startswith('.')
-             and os.path.isfile(os.path.join(path,f))]
-    
-    # Handle .nii.gz files specially
+    # Get all valid files in directory
     file_names = []
     file_extensions = []
-    for f in [fname for fname in os.listdir(path) if not fname.startswith('.') and os.path.isfile(os.path.join(path, fname))]:
-        if f.endswith('.nii.gz'):
-            file_names.append(f[:-7])  # Remove .nii.gz
+    
+    for fname in os.listdir(path):
+        # Skip hidden files and directories
+        if fname.startswith('.') or not os.path.isfile(os.path.join(path, fname)):
+            continue
+            
+        # Handle different file extensions
+        if fname.endswith('.nii.gz'):
+            file_names.append(fname[:-7])  # Remove .nii.gz
             file_extensions.append('nii.gz')
-        elif f.endswith('.nii'):
-            file_names.append(f[:-4])  # Remove .nii
+        elif fname.endswith('.nii'):
+            file_names.append(fname[:-4])  # Remove .nii
             file_extensions.append('nii')
-        elif f.endswith(('.tif', '.tiff', '.jpg', '.png')):
-            parts = os.path.splitext(f)
+        elif fname.endswith(('.tif', '.tiff', '.jpg', '.png')):
+            parts = os.path.splitext(fname)
             file_names.append(parts[0])
-            file_extensions.append(parts[1].split('.')[1] if parts[1].startswith('.') else parts[1])
+            file_extensions.append(parts[1].lstrip('.'))
 
+    # Process files: normalize extensions and convert formats
     new_file_extensions = []
     for file_name, file_ext in zip(file_names, file_extensions):
         if file_ext == 'tif':
             os.rename(os.path.join(path, file_name + '.tif'), os.path.join(path, file_name + '.tiff'))
             file_ext = 'tiff'
-        elif file_ext == 'nii' or file_ext == 'nii.gz':
+        elif file_ext in ('nii', 'nii.gz'):
             # Convert NIfTI to TIFF for processing
             suffix = '.nii.gz' if file_ext == 'nii.gz' else '.nii'
             nifti_path = os.path.join(path, file_name + suffix)

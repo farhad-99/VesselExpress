@@ -40,7 +40,6 @@ nibabel = ">=5.0.0"
 
 # ITK for advanced processing
 itk = ">=5.2.1"
-itk-io = ">=5.2.1"
 
 # Additional dependencies
 geomdl = ">=5.3.1"
