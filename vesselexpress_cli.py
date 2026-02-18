@@ -123,18 +123,24 @@ def run_vesselexpress(workspace_dir, cores="all", dry_run=False, verbose=False):
     print(f"Command: {' '.join(cmd)}\n")
     
     try:
-        result = subprocess.run(cmd, check=True)
+        # Run with stderr visible to user for diagnostics
+        result = subprocess.run(cmd, check=True, stderr=None)
         print("\n✓ VesselExpress completed successfully!")
         return 0
     except subprocess.CalledProcessError as e:
         print(f"\n✗ VesselExpress failed with exit code {e.returncode}")
+        print("Check the error messages above for details.")
         return e.returncode
 
 
 def print_nifti_info(input_file):
     """Print information about a NIfTI file."""
     try:
-        sys.path.insert(0, str(Path(__file__).parent / "VesselExpress" / "workflow" / "scripts"))
+        # Use absolute path for import
+        script_dir = Path(__file__).parent
+        scripts_path = script_dir / "VesselExpress" / "workflow" / "scripts"
+        sys.path.insert(0, str(scripts_path))
+        
         from nifti_utils import load_nifti, get_pixel_dimensions_from_nifti
         
         data, affine, header = load_nifti(input_file)

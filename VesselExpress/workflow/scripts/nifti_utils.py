@@ -76,6 +76,8 @@ def nifti_to_tiff(input_path, output_path=None):
         output_path = str(input_path_obj.parent / f"{stem}.tiff")
     
     # Save as TIFF
+    # Using 'minisblack' photometric interpretation for grayscale medical imaging data
+    # This is standard for single-channel intensity images like vessel scans
     imsave(output_path, data, photometric='minisblack')
     
     # Save metadata as a text file for reference
@@ -105,12 +107,18 @@ def get_pixel_dimensions_from_nifti(filepath):
     Returns:
     --------
     dimensions : str
-        Comma-separated pixel dimensions in format "z,y,x"
+        Comma-separated pixel dimensions in format "z,y,x" matching VesselExpress convention
+        
+    Note:
+    -----
+    NIfTI zooms are in (x, y, z) order by default, but we return (z, y, x) to match
+    VesselExpress's expected format for 3D image processing.
     """
     img = nib.load(filepath)
     zooms = img.header.get_zooms()
     
     # Return in z,y,x format as expected by VesselExpress
+    # NIfTI zooms are typically (x, y, z), so we reverse for VesselExpress
     if len(zooms) >= 3:
         return f"{zooms[2]},{zooms[1]},{zooms[0]}"
     else:

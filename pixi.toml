@@ -7,8 +7,8 @@ channels = ["conda-forge", "defaults"]
 platforms = ["linux-64", "osx-64", "osx-arm64"]
 
 [tasks]
-run = "cd VesselExpress && snakemake --use-conda --cores all --conda-frontend conda --snakefile ./workflow/Snakefile"
-run-cores = "cd VesselExpress && snakemake --use-conda --cores $CORES --conda-frontend conda --snakefile ./workflow/Snakefile"
+run = { cmd = "snakemake --use-conda --cores all --conda-frontend conda --snakefile ./workflow/Snakefile", cwd = "VesselExpress" }
+run-cores = { cmd = "snakemake --use-conda --cores $CORES --conda-frontend conda --snakefile ./workflow/Snakefile", cwd = "VesselExpress" }
 
 [dependencies]
 python = ">=3.7,<3.12"
