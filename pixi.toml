@@ -1,0 +1,55 @@
+[project]
+name = "vesselexpress"
+version = "1.0.0"
+description = "Rapid and fully automated blood vasculature analysis in 3D light-sheet image volumes"
+authors = ["VesselExpress Team"]
+channels = ["conda-forge", "defaults"]
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+
+[tasks]
+run = { cmd = "snakemake --use-conda --cores all --conda-frontend conda --snakefile ./workflow/Snakefile", cwd = "VesselExpress" }
+run-cores = { cmd = "snakemake --use-conda --cores $CORES --conda-frontend conda --snakefile ./workflow/Snakefile", cwd = "VesselExpress" }
+
+[dependencies]
+python = ">=3.7,<3.12"
+snakemake = ">=6.7.0"
+pip = "*"
+
+# Core dependencies from Pipeline.yml
+numpy = ">=1.21.5"
+scipy = ">=1.7.3"
+scikit-image = ">=0.19.1"
+pandas = ">=1.3.5"
+matplotlib = ">=3.5.1"
+networkx = ">=2.6.3"
+pillow = ">=9.0.0"
+tifffile = ">=2021.11.2"
+imageio = ">=2.13.5"
+pyyaml = ">=6.0"
+dask = ">=2022.1.0"
+
+[pypi-dependencies]
+# Image processing
+aicsimageio = ">=4.5.2"
+aicssegmentation = ">=0.4.2"
+numpy-stl = ">=2.16.3"
+dask-image = ">=2021.12.0"
+
+# NIfTI support
+nibabel = ">=5.0.0"
+
+# ITK for advanced processing
+itk = ">=5.2.1"
+
+# Additional dependencies
+geomdl = ">=5.3.1"
+zarr = ">=2.10.3"
+xarray = ">=0.20.2"
+
+[feature.blender.dependencies]
+# Blender for 3D rendering (optional)
+# Note: Blender may need to be installed separately on some systems
+
+[feature.gpu.dependencies]
+# GPU dependencies for FrangiNet
+# pytorch and related GPU packages would go here

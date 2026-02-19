@@ -12,16 +12,59 @@ configfile: get_config_file('data')
 
 
 def get_files_and_extensions(path):
-    files = [os.path.splitext(f) for f in os.listdir(path) if (f.endswith('tif') or f.endswith('.tiff')
-             or f.endswith('.jpg')) or f.endswith('.png') and not f.startswith('.')
-             and os.path.isfile(os.path.join(path,f))]
-    file_names = [f[0] for f in files]
-    file_extensions = [f[1].split('.')[1] for f in files]
+    # Get all valid files in directory
+    file_names = []
+    file_extensions = []
+    
+    for fname in os.listdir(path):
+        # Skip hidden files and directories
+        if fname.startswith('.') or not os.path.isfile(os.path.join(path, fname)):
+            continue
+            
+        # Handle different file extensions
+        if fname.endswith('.nii.gz'):
+            file_names.append(fname[:-7])  # Remove .nii.gz
+            file_extensions.append('nii.gz')
+        elif fname.endswith('.nii'):
+            file_names.append(fname[:-4])  # Remove .nii
+            file_extensions.append('nii')
+        elif fname.endswith(('.tif', '.tiff', '.jpg', '.png')):
+            parts = os.path.splitext(fname)
+            file_names.append(parts[0])
+            file_extensions.append(parts[1].lstrip('.'))
 
+    # Process files: normalize extensions and convert formats
     new_file_extensions = []
     for file_name, file_ext in zip(file_names, file_extensions):
         if file_ext == 'tif':
-            os.rename(os.path.join(path, file_name + '.tif'), os.path.join(os.path.join(path, file_name + '.tiff')))
+            # Rename .tif to .tiff for consistency
+            tif_path = os.path.join(path, file_name + '.tif')
+            tiff_path = os.path.join(path, file_name + '.tiff')
+            try:
+                if os.path.exists(tif_path):
+                    os.rename(tif_path, tiff_path)
+                file_ext = 'tiff'
+            except (FileNotFoundError, PermissionError) as e:
+                print(f"Warning: Could not rename {tif_path}: {e}")
+                # Continue with 'tif' extension if rename fails
+        elif file_ext in ('nii', 'nii.gz'):
+            # Convert NIfTI to TIFF for processing
+            suffix = '.nii.gz' if file_ext == 'nii.gz' else '.nii'
+            nifti_path = os.path.join(path, file_name + suffix)
+            tiff_path = os.path.join(path, file_name + '.tiff')
+            if not os.path.exists(tiff_path):
+                try:
+                    # Import and convert using absolute path
+                    import sys
+                    snakefile_dir = os.path.dirname(os.path.abspath(__file__))
+                    scripts_path = os.path.join(snakefile_dir, 'workflow', 'scripts')
+                    if scripts_path not in sys.path:
+                        sys.path.insert(0, scripts_path)
+                    from nifti_utils import nifti_to_tiff
+                    nifti_to_tiff(nifti_path, tiff_path)
+                except Exception as e:
+                    print(f"Error converting NIfTI file {nifti_path}: {e}")
+                    raise
             file_ext = 'tiff'
         new_file_extensions.append(file_ext)
 

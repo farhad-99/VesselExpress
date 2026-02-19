@@ -93,9 +93,68 @@ If you want to use the **command-line interface**, follow these instructions:
       decreasing the number of cores when working on an office PC to avoid out of memory errors. You can specify the 
       number of cores via the flag -e. To run VesselExpress with 4 cores use ```docker run -v path-to-data-and-config:/home/user/VesselExpress/data -e 'CORES=4' vesselexpress_cli```
 
-## Local Version (without Docker)
-We recommend using the Docker version. The local version is intended for development.
-So far we have tested this on Ubuntu and macOS (excluding Frangi-Net). If you're using Windows, please use the Docker version.
+## CLI Version with Pixi (Recommended for Local Use)
+
+**NEW!** VesselExpress now supports [Pixi](https://prefix.dev/) for fast, reproducible package management and includes a simplified CLI with **NIfTI file support**.
+
+### Features
+- 🚀 Fast dependency management with Pixi
+- 💉 Native support for NIfTI files (.nii, .nii.gz)
+- 🎯 Simplified command-line interface
+- 📦 Reproducible environments
+
+### Quick Start
+
+```bash
+# 1. Install Pixi
+curl -fsSL https://pixi.sh/install.sh | bash
+
+# 2. Clone repository
+git clone https://github.com/farhad-99/VesselExpress.git
+cd VesselExpress
+
+# 3. Install dependencies
+pixi install
+
+# 4. Activate environment
+pixi shell
+
+# 5. Run on any supported image format
+python vesselexpress_cli.py -i your_image.tiff
+# or
+python vesselexpress_cli.py -i brain_vessels.nii.gz
+```
+
+### Supported File Formats
+- TIFF (.tif, .tiff)
+- PNG (.png)
+- JPG (.jpg)
+- **NIfTI (.nii, .nii.gz)** ← NEW!
+
+### CLI Examples
+
+```bash
+# Process a NIfTI file
+python vesselexpress_cli.py -i brain_vessels.nii.gz
+
+# Check NIfTI file information
+python vesselexpress_cli.py -i brain_vessels.nii.gz --info
+
+# Use custom configuration
+python vesselexpress_cli.py -i sample.tiff -c custom_config.json
+
+# Specify number of cores
+python vesselexpress_cli.py -i sample.tiff --cores 4
+
+# Dry run to preview pipeline
+python vesselexpress_cli.py -i sample.tiff --dry-run
+```
+
+📖 **For detailed instructions, see [CLI_PIXI_GUIDE.md](CLI_PIXI_GUIDE.md)**
+
+## Local Version (without Docker or Pixi)
+We recommend using the Pixi version (above) or Docker version. The traditional local version is intended for development.
+So far we have tested this on Ubuntu and macOS (excluding Frangi-Net). If you're using Windows, please use Docker or Pixi.
 
 For the **browser version** follow these instructions:
 1. Install [Blender](https://www.blender.org/download/) (optional for rendering). \
